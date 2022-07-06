@@ -87,5 +87,5 @@ func (s *store) Close() error {
 }
 
 func (s *store) Name() string {
-	return s.Name()
+	return s.File.Name()
 }

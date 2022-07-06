@@ -1,6 +1,7 @@
 package log
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -29,5 +30,24 @@ func TestSegment(t *testing.T) {
 		got, err := s.Read(off)
 		require.NoError(t, err)
 		require.Equal(t, want.Value, got.Value)
+
 	}
+	_, err = s.Append(want)
+	require.Equal(t, io.EOF, err)
+
+	// maxed index
+	require.True(t, s.IsMaxed())
+	c.Segment.MaxStoreBytes = uint64(len(want.Value) * 3)
+	c.Segment.MaxIndexBytes = 1024
+
+	s, err = newSegment(dir, 16, c)
+	require.NoError(t, err)
+	// maxed store
+	require.True(t, s.IsMaxed())
+
+	err = s.Remove()
+	require.NoError(t, err)
+	s, err = newSegment(dir, 16, c)
+	require.NoError(t, err)
+	require.False(t, s.IsMaxed())
 }
