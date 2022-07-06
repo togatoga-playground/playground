@@ -5,8 +5,6 @@ import (
 	"encoding/binary"
 	"os"
 	"sync"
-
-	api "github.com/travisjeffery/proglog/api/v1"
 )
 
 var (
@@ -86,8 +84,4 @@ func (s *store) Close() error {
 		return err
 	}
 	return s.File.Close()
-}
-
-func (s *segment) Append(record *api.Record) {
-
 }
