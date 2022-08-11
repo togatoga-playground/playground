@@ -1,15 +1,19 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { MonochromePhotosRounded, NightShelter } from '@mui/icons-material'
-
+/**
+ * Responsiveプロパティ
+ */
 export type ResponsiveProp<T> = {
-  base?: T // default
-  sm?: T // 640px
-  md?: T // 768px
-  lg?: T // 1024px
-  xl?: T // 1280px
+  base?: T
+  sm?: T
+  md?: T
+  lg?: T
+  xl?: T
 }
 export type Responsive<T> = T | ResponsiveProp<T>
 
+/**
+ * Flex
+ */
 type SelfPosition =
   | 'center'
   | 'end'
@@ -40,6 +44,19 @@ export type CSSPropertyAlignItems =
   | 'baseline'
   | 'normal'
   | 'stretch'
+  // コードの自動補完
+  | (string & {})
+
+export type CSSPropertyAlignContent =
+  | CSSPropertyGlobals
+  | ContentDistribution
+  | 'center'
+  | 'end'
+  | 'flex-end'
+  | 'flex-start'
+  | 'start'
+  | 'baseline'
+  | 'normal'
   | (string & {})
 
 export type CSSPropertyJustifyItems =
@@ -52,6 +69,7 @@ export type CSSPropertyJustifyItems =
   | 'right'
   | 'stretch'
   | (string & {})
+
 export type CSSPropertyJustifyContent =
   | CSSPropertyGlobals
   | ContentDistribution
@@ -60,6 +78,7 @@ export type CSSPropertyJustifyContent =
   | 'normal'
   | 'right'
   | (string & {})
+
 export type CSSPropertyFlexWrap =
   | CSSPropertyGlobals
   | 'nowrap'
@@ -83,6 +102,7 @@ export type CSSPropertyJustifySelf =
   | 'right'
   | 'stretch'
   | (string & {})
+
 export type CSSPropertyAlignSelf =
   | CSSPropertyGlobals
   | SelfPosition
@@ -92,16 +112,23 @@ export type CSSPropertyAlignSelf =
   | 'stretch'
   | (string & {})
 
+/**
+ * Grid
+ */
 type GridLine = 'auto' | (string & {})
+
 export type CSSPropertyGridColumn =
   | CSSPropertyGlobals
   | GridLine
   | (string & {})
+
 export type CSSPropertyGridRow = CSSPropertyGlobals | GridLine | (string & {})
+
 export type CSSPropertyGridAutoFlow =
   | CSSPropertyGlobals
   | 'column'
   | 'dense'
   | 'row'
   | (string & {})
+
 export type CSSPropertyGridArea = CSSPropertyGlobals | GridLine | (string & {})
