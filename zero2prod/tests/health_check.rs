@@ -1,7 +1,26 @@
+use once_cell::sync::Lazy;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
+use tracing::Subscriber;
 use uuid::Uuid;
-use zero2prod::configuration::{get_configuration, DatabaseSettings};
+use zero2prod::{
+    configuration::{get_configuration, DatabaseSettings},
+    telemetry::{get_subscriber, init_subscriber},
+};
+
+static TRACING: Lazy<()> = Lazy::new(|| {
+    let subscriber: Box<dyn Subscriber + Send + Sync> = if std::env::var("TEST_LOG").is_ok() {
+        Box::new(get_subscriber(
+            "test".into(),
+            "debug".into(),
+            std::io::stdout,
+        ))
+    } else {
+        Box::new(get_subscriber("test".into(), "debug".into(), std::io::sink))
+    };
+
+    init_subscriber(subscriber);
+});
 
 pub struct TestApp {
     pub address: String,
@@ -32,6 +51,7 @@ pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
 }
 
 async fn spawn_app() -> TestApp {
+    Lazy::force(&TRACING);
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
     let port = listener.local_addr().expect("Failed to get port").port();
     let address = format!("http://127.0.0.1:{}", port);
