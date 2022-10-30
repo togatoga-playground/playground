@@ -3,11 +3,11 @@ region: ja
 services:
   - name: zero2prod
     dockerfile_path: Dockerfile
-    source_dir: .
+    source_dir: zero2prod
     github:
       branch: main
       deploy_on_push: true
-      repo: togatoga/playground/zero2prod
+      repo: togatoga/playground
     health_check:
       http_path: /health_check
       http_port: 8000
