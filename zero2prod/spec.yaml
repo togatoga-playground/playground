@@ -1,8 +1,8 @@
 name: zero2prod
-region: ja
+region: fra # `fra` stands for Frankfurt
 services:
   - name: zero2prod
-    dockerfile_path: Dockerfile
+    dockerfile_path: zero2prod/Dockerfile
     source_dir: zero2prod
     github:
       branch: main
@@ -10,9 +10,8 @@ services:
       repo: togatoga/playground
     health_check:
       http_path: /health_check
-      http_port: 8000
-      instance_count: 1
-      instance_size_slug: basic-xxs
-      routes:
-        - path: /
-    
+    http_port: 8000
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    routes:
+      - path: /
