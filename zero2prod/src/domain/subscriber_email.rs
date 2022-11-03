@@ -4,8 +4,7 @@ use validator::validate_email;
 pub struct SubscriberEmail(String);
 
 impl SubscriberEmail {
-    pub fn parse(s: String) -> Result<SubscriberEmail, String> {
-        eprintln!("toggaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: {}", s);
+    pub fn parse(s: String) -> Result<SubscriberEmail, String> {        
         if validate_email(&s) {
             Ok(Self(s))
         } else {
@@ -23,6 +22,15 @@ impl AsRef<str> for SubscriberEmail {
 mod tests {
     use super::SubscriberEmail;
     use claim::assert_err;
+    use fake::faker::internet::en::SafeEmail;
+    use fake::Fake;
+
+
+    #[test]
+    fn valid_emails_are_parsed_successfully() {
+        let email = SafeEmail().fake();
+        claim::assert_ok!(SubscriberEmail::parse(email));
+    }
 
     #[test]
     fn empty_string_is_rejected() {
