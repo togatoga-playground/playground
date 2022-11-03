@@ -1,11 +1,15 @@
+use validator::validate_email;
+
 #[derive(Debug)]
 pub struct SubscriberEmail(String);
 
-
 impl SubscriberEmail {
     pub fn parse(s: String) -> Result<SubscriberEmail, String> {
-        // TODO
-        Ok(Self(s))
+        if validate_email(&s) {
+            Ok(Self(s))
+        } else {
+            Err(format!("{} is not a valid subscriber email.", s))
+        }
     }
 }
 impl AsRef<str> for SubscriberEmail {
@@ -14,12 +18,10 @@ impl AsRef<str> for SubscriberEmail {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::SubscriberEmail;
     use claim::assert_err;
-
 
     #[test]
     fn empty_string_is_rejected() {
