@@ -3,7 +3,9 @@ use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::domain::{NewSubscriber, SubscriberName};
+use crate::domain::SubscriberName;
+use crate::domain::NewSubscriber;
+
 
 #[derive(serde::Deserialize)]
 pub struct FormData {
