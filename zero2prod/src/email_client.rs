@@ -17,7 +17,10 @@ impl EmailClient {
         authorization_token: Secret<String>,
     ) -> Self {
         Self {
-            http_client: Client::new(),
+            http_client: Client::builder()
+                .timeout(std::time::Duration::from_secs(10))
+                .build()
+                .unwrap(),
             base_url,
             sender,
             authorization_token,
@@ -94,6 +97,21 @@ mod tests {
     }
     fn email_client(base_url: String) -> EmailClient {
         EmailClient::new(base_url, email(), Secret::new(Faker.fake()))
+    }
+
+    #[tokio::test]
+    async fn send_email_times_out_if_the_server_takes_too_long() {
+        let mock_server = MockServer::start().await;
+        Mock::given(any())
+            .respond_with(ResponseTemplate::new(200).set_delay(std::time::Duration::from_secs(180)))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+        let email_client = email_client(mock_server.uri());
+        let outcome = email_client
+            .send_email(email(), &subject(), &content(), &content())
+            .await;
+        assert_err!(outcome);
     }
 
     #[tokio::test]
