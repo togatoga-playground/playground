@@ -53,6 +53,7 @@ impl EmailClient {
 }
 
 #[derive(serde::Serialize)]
+#[serde(rename_all = "PascalCase")]
 struct SendEmailRequest {
     from: String,
     to: String,
@@ -71,7 +72,10 @@ mod tests {
         Fake, Faker,
     };
     use secrecy::Secret;
-    use wiremock::{matchers::any, Mock, MockServer, ResponseTemplate};
+    use wiremock::{
+        matchers::{header, header_exists, method, path},
+        Mock, MockServer, ResponseTemplate,
+    };
 
     use crate::domain::SubscriberEmail;
 
@@ -82,7 +86,11 @@ mod tests {
         let sender = SubscriberEmail::parse(SafeEmail().fake()).unwrap();
         let email_client = EmailClient::new(mock_server.uri(), sender, Secret::new(Faker.fake()));
 
-        Mock::given(any())
+        Mock::given(header_exists("X-Postmark-Server-Token"))
+            .and(header("Content-Type", "application/json"))
+            .and(path("/email"))
+            .and(method("POST"))
+            .and(SendEmailBodyMatcher)
             .respond_with(ResponseTemplate::new(200))
             .expect(1)
             .mount(&mock_server)
@@ -95,5 +103,20 @@ mod tests {
         let _ = email_client
             .send_email(subscriver_email, &subject, &subject, &content)
             .await;
+    }
+
+    struct SendEmailBodyMatcher;
+    impl wiremock::Match for SendEmailBodyMatcher {
+        fn matches(&self, request: &wiremock::Request) -> bool {
+            let result =
+                serde_json::from_slice::<serde_json::Value>(&request.body).map_or(false, |body| {
+                    body.get("From").is_some()
+                        && body.get("To").is_some()
+                        && body.get("Subject").is_some()
+                        && body.get("HtmlBody").is_some()
+                        && body.get("TextBody").is_some()
+                });
+            result
+        }
     }
 }
